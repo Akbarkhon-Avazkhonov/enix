@@ -12,7 +12,7 @@ interface State {
   chats: Record<string, ChatSession>;
   currentChatId: string | null;
   selectedModel: string | null;
-  userName: string | "Anonymous";
+  userName: string ;
   isDownloading: boolean;
   downloadProgress: number;
   downloadingModel: string | null;
@@ -39,7 +39,7 @@ const useChatStore = create<State & Actions>()(
       chats: {},
       currentChatId: null,
       selectedModel: null,
-      userName: "Anonymous",
+      userName: "User",
       isDownloading: false,
       downloadProgress: 0,
       downloadingModel: null, 

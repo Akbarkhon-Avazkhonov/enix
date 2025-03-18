@@ -1,35 +1,49 @@
-import { createOllama } from 'ollama-ai-provider';
-import { streamText, convertToCoreMessages, CoreMessage, UserContent } from 'ai';
+import { createOllama } from "ollama-ai-provider";
+import { streamText, convertToCoreMessages, CoreMessage, UserContent } from "ai";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-  // Destructure request data
-  const { messages, selectedModel, data } = await req.json();
-
+  const { messages, selectedModel, data, mode } = await req.json();
   const ollamaUrl = process.env.OLLAMA_URL;
 
-  const initialMessages = messages.slice(0, -1); 
-  const currentMessage = messages[messages.length - 1]; 
+  const ollama = createOllama({ baseURL: ollamaUrl + "/api" });
 
-  const ollama = createOllama({baseURL: ollamaUrl + "/api"});
+  if (mode === "image") {
+    // Генерация изображения
+    const prompt = messages[messages.length - 1]?.content;
+    
+    const response = await fetch(`https://api.enix.uz/generateImage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({text: prompt }),
+    });
 
-  // Build message content array directly
-  const messageContent: UserContent = [{ type: 'text', text: currentMessage.content }];
+    const imageResult = await response.json();
+    return new Response(JSON.stringify({ image: imageResult.url }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
-  // Add images if they exist
+  // Генерация текста
+  const initialMessages = messages.slice(0, -1);
+  const currentMessage = messages[messages.length - 1];
+
+  const messageContent: UserContent = [{ type: "text", text: currentMessage.content }];
+
+  // Добавление изображений, если они есть
   data?.images?.forEach((imageUrl: string) => {
     const image = new URL(imageUrl);
-    messageContent.push({ type: 'image', image });
+    messageContent.push({ type: "image", image });
   });
 
-  // Stream text using the ollama model
+  // Потоковая генерация текста
   const result = await streamText({
-    model: ollama(selectedModel),
+    model: ollama(process.env.OLLAMA_MODEL || ""),
     messages: [
       ...convertToCoreMessages(initialMessages),
-      { role: 'user', content: messageContent },
+      { role: "user", content: messageContent },
     ],
   });
 

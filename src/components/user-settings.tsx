@@ -1,45 +1,51 @@
 "use client";
 
+import { Monitor, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { GearIcon } from "@radix-ui/react-icons";
-import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
-import { Skeleton } from "./ui/skeleton";
-import { set } from "zod";
-import UsernameForm from "./username-form";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import EditUsernameForm from "./edit-username-form";
 import PullModel from "./pull-model";
 import useChatStore from "@/app/hooks/useChatStore";
 
 export default function UserSettings() {
   const [open, setOpen] = useState(false);
+  const { setTheme, theme } = useTheme();
+  const userName = localStorage.getItem("ollama_user") || "User";
+  // Function to cycle through themes
+  const toggleTheme = () => {
+    if (theme === "system") setTheme("light");
+    else if (theme === "light") setTheme("dark");
+    else setTheme("system");
+  };
 
-  const userName = useChatStore((state) => state.userName);
+  // Get current theme icon
+  const getThemeIcon = () => {
+    switch (theme) {
+      case "light":
+        return <Sun className="size-4" />;
+      case "dark":
+        return <Moon className="size-4" />;
+      default:
+        return <Monitor className="size-4" />;
+    }
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex justify-start gap-3 w-full h-14 text-base font-normal items-center "
+          className="flex justify-start gap-3 w-full h-14 text-base font-normal items-center"
         >
           <Avatar className="flex justify-start items-center overflow-hidden">
             <AvatarImage
@@ -59,26 +65,39 @@ export default function UserSettings() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48 p-2">
+
+        {/* Theme Toggle Button */}
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <PullModel />
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 p-1"
+            onClick={toggleTheme}
+          >
+            {getThemeIcon()}
+            <span>
+              {theme === "system" ? "Системный" : 
+               theme === "light" ? "Светлый" : "Тёмный"}
+            </span>
+          </Button>
         </DropdownMenuItem>
-        <Dialog>
+
+        {/* Profile Dialog */}
+        {/* <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="w-full">
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               <div className="flex w-full gap-2 p-1 items-center cursor-pointer">
-                <GearIcon className="w-4 h-4" />
-                Settings
+                <AvatarIcon className="w-4 h-4" />
+                Профиль
               </div>
             </DropdownMenuItem>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader className="space-y-4">
-              <DialogTitle>Settings</DialogTitle>
+              <DialogTitle>Профиль</DialogTitle>
               <EditUsernameForm setOpen={setOpen} />
             </DialogHeader>
           </DialogContent>
-        </Dialog>
-        <Dialog></Dialog>
+        </Dialog> */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

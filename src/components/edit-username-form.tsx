@@ -20,7 +20,7 @@ import useChatStore from "@/app/hooks/useChatStore";
 
 const formSchema = z.object({
   username: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
+    message: "Имя должно содержать не менее 2 символов.",
   }),
 });
 
@@ -41,27 +41,25 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setUserName(values.username); // Update the userName in the store
-    toast.success("Name updated successfully");
+    toast.success("Имя успешно обновлено");
   }
 
   return (
     <Form {...form}>
-      <div className="w-full flex flex-col gap-4 pt-4">
-        <FormLabel>Theme</FormLabel>
-        <ModeToggle />
-      </div>
+
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Имя</FormLabel>
               <FormControl>
                 <div className="md:flex gap-4">
-                  <Input {...field} type="text" placeholder="Enter your name" />
-                  <Button type="submit">Change name</Button>
+                  <Input {...field} type="text" placeholder="Введите свое имя" />
+                  <Button type="submit">Поменять имя</Button>
                 </div>
+                
               </FormControl>
               <FormMessage />
             </FormItem>

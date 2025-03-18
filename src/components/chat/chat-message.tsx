@@ -142,7 +142,7 @@ function ChatMessage({ message, isLast, isLoading, reload }: ChatMessageProps) {
     <motion.div {...MOTION_CONFIG} className="flex flex-col gap-2 whitespace-pre-wrap">
       <ChatBubble variant={message.role === "user" ? "sent" : "received"}>
         <ChatBubbleAvatar
-          src={message.role === "assistant" ? "/ollama.png" : ""}
+          src={message.role === "assistant" ? "/enix-logo.png" : "/user.png"}
           width={6}
           height={6}
           className="object-contain dark:invert"

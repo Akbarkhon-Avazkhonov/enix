@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
+import { MoreHorizontal, SquarePen, Trash2,  LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Message } from "ai/react";
@@ -46,6 +46,13 @@ export function Sidebar({
   closeSidebar,
 }: SidebarProps) {
   const router = useRouter();
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("ollama_user");
+    localStorage.removeItem("ollama_token");
+    window.location.reload();
+  };
 
   const chats = useChatStore((state) => state.chats);
   const handleDelete = useChatStore((state) => state.handleDelete);
@@ -69,20 +76,20 @@ export function Sidebar({
           <div className="flex gap-3 items-center ">
             {!isCollapsed && !isMobile && (
               <Image
-                src="/ollama.png"
+                src="/enix-logo.png"
                 alt="AI"
                 width={28}
                 height={28}
                 className="dark:invert hidden 2xl:block"
               />
             )}
-            New chat
+            Новый чат
           </div>
           <SquarePen size={18} className="shrink-0 w-4 h-4" />
         </Button>
 
         <div className="flex flex-col pt-10 gap-2">
-          <p className="pl-4 text-xs text-muted-foreground">Your chats</p>
+            <p className="pl-4 text-xs text-muted-foreground"><strong>История</strong></p>
           <Suspense fallback>
             {chats &&
               Object.entries(chats)
@@ -132,18 +139,17 @@ export function Sidebar({
                               onClick={(e) => e.stopPropagation()}
                             >
                               <Trash2 className="shrink-0 w-4 h-4" />
-                              Delete chat
+                              Удалить чат
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader className="space-y-4">
-                              <DialogTitle>Delete chat?</DialogTitle>
+                              <DialogTitle>Удалить чат?</DialogTitle>
                               <DialogDescription>
-                                Are you sure you want to delete this chat? This
-                                action cannot be undone.
+                              Вы уверены, что хотите удалить этот чат? Это действие нельзя отменить.
                               </DialogDescription>
                               <div className="flex justify-end gap-2">
-                                <Button variant="outline">Cancel</Button>
+                                <Button variant="outline">Отменить</Button>
                                 <Button
                                   variant="destructive"
                                   onClick={(e) => {
@@ -152,7 +158,7 @@ export function Sidebar({
                                     router.push("/");
                                   }}
                                 >
-                                  Delete
+                                  Да
                                 </Button>
                               </div>
                             </DialogHeader>
@@ -166,8 +172,34 @@ export function Sidebar({
         </div>
       </div>
 
-      <div className="justify-end px-2 py-2 w-full border-t">
+        <div className="flex justify-end px-2 py-2 w-full border-t">
         <UserSettings />
+        <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className="mx-2 flex gap-2 h-14 text-base font-normal items-center"
+            >
+              <LogOut size={16} color="red" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Выйти из аккаунта?</DialogTitle>
+              <DialogDescription>
+                Вы уверены, что хотите выйти? Вам придется снова войти в систему.
+              </DialogDescription>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={() => setLogoutDialogOpen(false)}>
+                  Отмена
+                </Button>
+                <Button variant="destructive" onClick={handleLogout}>
+                  Выйти
+                </Button>
+              </div>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
